@@ -34,10 +34,8 @@ import {getUserID} from "../userInfo";
 const Dashboard = () => {
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const id = getUserID();
   const customers = useSelector((state) => state.customers);
   const dispatch = useDispatch();
@@ -56,27 +54,46 @@ const Dashboard = () => {
       {
         accessorKey: "userId",
         header: "userId",
-        size: 150,
-        enableEditing: true,
+        size: 0,
+        enableEditing: false,
       },
       {
         accessorKey: "name",
         header: "name",
-        size: 150,
+        size: 250,
         enableEditing: true,
       },
       {
         accessorKey: "phone",
         header: "phone",
-        size: 150,
+        size: 250,
         enableEditing: true,
         enableClickToCopy: true,
       },
       {
         accessorKey: "total",
         header: "total",
-        size: 150,
+        size: 250,
         enableEditing: true,
+      },{
+        accessorKey: "transactions",
+        header: "Transactions",
+        size: 350,
+        enableEditing: false,
+        Cell: ({ cell }) => {
+          const transactions = cell.getValue();
+          if (!transactions || transactions.length === 0) return "No transactions";
+          
+          return (
+            <ul style={{ padding: 0, margin: 0, listStyleType: "none" }}>
+              {transactions.map((transaction, index) => (
+                <li key={index}>
+                  <strong>{transaction.type}:</strong> {transaction.amount} ({new Date(transaction.date).toLocaleDateString()}) - {transaction.for}
+                </li>
+              ))}
+            </ul>
+          );
+        },
       },
     ],
     []
@@ -103,14 +120,14 @@ const Dashboard = () => {
 //     setOpenDeleteConfirmModal(null);
 //   };
 
-//   const handleCreateUser = async ({ values, table }) => {
-//     dispatch(register(firstName, lastName, email, password))
-//     table.setCreatingRow(null);
-//     setLoading(true)
-//     setTimeout(() => {
-//       setLoading(false)
-//     }, 3000);
-//   };
+  const handleAddingCustomer = async ({ values, table }) => {
+    dispatch(addCustomer(name, phone))
+    table.setCreatingRow(null);
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+    }, 3000);
+  };
   const table = useMaterialReactTable({
     initialState: { columnVisibility: { _id: false } },
     columns,
@@ -120,7 +137,7 @@ const Dashboard = () => {
     enableEditing: true,
     //getRowId: (row) => row.id,
     // onEditingRowSave: handleSaveUser,
-    // onCreatingRowSave: handleCreateUser,
+    onCreatingRowSave: handleAddingCustomer,
     renderRowActions: ({ row, table }) => (
       <Box sx={{ display: "flex", gap: "1rem" }}>
         <Tooltip title="Edit">
@@ -137,40 +154,24 @@ const Dashboard = () => {
     ),
     renderCreateRowDialogContent: ({ table, row }) => (
       <>
-        <DialogTitle variant="h3">Add new user</DialogTitle>
+        <DialogTitle variant="h3">Add new customer</DialogTitle>
         <DialogContent
           sx={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: "20px" }}
         >
          <TextField
             type="text"
-            label="first name"
-            // onChange={(event) => {
-            //   setFirstName(event.target.value);
-            // }}
+            label="name"
+            onChange={(event) => {
+              setName(event.target.value);
+            }}
             required
           />
           <TextField
             type="text"
-            label="last name"
-            // onChange={(event) => {
-            //   setLastName(event.target.value);
-            // }}
-            required
-          />
-          <TextField
-            type="email"
-            label="email"
-            // onChange={(event) => {
-            //   setEmail(event.target.value);
-            // }}
-            required
-          />
-          <TextField
-            type="password"
-            label="password"
-            // onChange={(event) => {
-            //   setPassword(event.target.value);
-            // }}
+            label="phone"
+            onChange={(event) => {
+              setPhone(event.target.value);
+            }}
             required
           />
         </DialogContent>
@@ -183,30 +184,30 @@ const Dashboard = () => {
       <Button
         variant="contained"
         onClick={() => {
-          table.setCreatingRow(true); //simplest way to open the create row modal with no default values
+          table.setCreatingRow(true); 
         }}
-        style={{backgroundColor:"#d21034", padding:"10px", textTransform:"none", fontSize:"20px"}}
+        style={{backgroundColor:"rgba(253,187,45,1)", padding:"10px", textTransform:"none", fontSize:"20px"}}
       >
-        Add user
+        Add customer
       </Button>
     ),
   });
-//   if (openDeleteConfirmModal !== null) {
-//     return(
-//     <div>
-//       <MaterialReactTable table={table} />
-//       <Popup
-//         title="Are you sure you want to delete this user?"
-//         cancelLabel="Cancel"
-//         confirmLabel="Delete"
-//         onReject={() => {
-//           setOpenDeleteConfirmModal(null);
-//         }}
-//         onAccept={() => handleDelete(openDeleteConfirmModal.original._id)}
-//       />
-//     </div>
-//     );
-//   }
+  if (openDeleteConfirmModal !== null) {
+    return(
+    <div>
+      <MaterialReactTable table={table} />
+      <Popup
+        title="Are you sure you want to delete this customer?"
+        cancelLabel="Cancel"
+        confirmLabel="Delete"
+        onReject={() => {
+          setOpenDeleteConfirmModal(null);
+        }}
+        // onAccept={() => handleDelete(openDeleteConfirmModal.original._id)}
+      />
+    </div>
+    );
+  }
   if (customers.length === 0 || loading) {
     return (
       <>

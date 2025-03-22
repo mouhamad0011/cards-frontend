@@ -50,7 +50,7 @@
   
   .confirmation-popup-container .confirmation-popup-buttons button {
     padding: 10px;
-    background-color: #006A4A;
+    background-color: rgb(34,193,195);
     width: 100%;
     border: none;
     color: white;
@@ -59,17 +59,17 @@
   }
   .confirmation-popup-container .confirmation-popup-buttons button:hover{
     cursor: pointer;
-    background-color: #02835c;
+    background-color: rgb(30, 171, 173);
   }
   .confirmation-popup-container .confirmation-popup-buttons .confirmation-popup-button-cancel {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 10px;
-    background-color: #d21034;
+    background-color: rgba(253,187,45);
     font-size: 20px;
   }
   .confirmation-popup-container .confirmation-popup-buttons .confirmation-popup-button-cancel:hover{
     cursor: pointer;
-    background-color: #e82347;
+    background-color: rgb(220, 163, 39);
   }
 
 
