@@ -1,0 +1,83 @@
+.confirmation-popup-container {
+    z-index: 1;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: #484848;
+    width: 360px;
+    height: 180px;
+    border-radius: 12px;
+    padding: 20px;
+    z-index: 3;
+  }
+  
+  .confirmation-popup-container .confirmation-popup-close::before,
+  .confirmation-popup-container .confirmation-popup-close::after {
+    content: "";
+    position: absolute;
+    top: 18px;
+    width: 20px;
+    height: 5px;
+    background-color: white;
+    right: 8px;
+  }
+  
+  .confirmation-popup-container .confirmation-popup-close::before {
+    transform: rotate(45deg);
+  }
+  
+  .confirmation-popup-container .confirmation-popup-close::after {
+    transform: rotate(-45deg);
+  }
+  
+  .confirmation-popup-container .confirmation-popup-title {
+    position: absolute;
+    top: -5%;
+    padding: 10px;
+    transform: translateX(-3%);
+    font-size: 22px;
+  }
+  
+  .confirmation-popup-container .confirmation-popup-buttons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+  }
+  
+  .confirmation-popup-container .confirmation-popup-buttons button {
+    padding: 10px;
+    background-color: #006A4A;
+    width: 100%;
+    border: none;
+    color: white;
+    border-bottom-right-radius: 10px;
+    font-size: 20px;
+  }
+  .confirmation-popup-container .confirmation-popup-buttons button:hover{
+    cursor: pointer;
+    background-color: #02835c;
+  }
+  .confirmation-popup-container .confirmation-popup-buttons .confirmation-popup-button-cancel {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 10px;
+    background-color: #d21034;
+    font-size: 20px;
+  }
+  .confirmation-popup-container .confirmation-popup-buttons .confirmation-popup-button-cancel:hover{
+    cursor: pointer;
+    background-color: #e82347;
+  }
+
+
+  
+@media screen and (max-width: 576px) {
+  .confirmation-popup-container {
+    width: 300px;
+    height: 150px;
+    top: 28%;
+  }
+}
