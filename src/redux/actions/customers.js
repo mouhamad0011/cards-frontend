@@ -80,7 +80,27 @@ export const getCustomersByUser = (userId) => {
     };
   };
 
-  
+  export const editCustomer = (customerId, name, phone) => {
+    return (dispatch) => {
+      return new Promise((resolve, reject) => {
+        axios
+          .post(`${process.env.REACT_APP_BACKEND}/customers/editCustomer`, {customerId, name, phone})
+          .then((response) => {
+            const customer = response.data.customer;
+            dispatch({
+              type: "editCustomer",
+              payload:{ customer, Id: customerId} ,
+            });
+            resolve(); 
+          })
+          .catch((error) => {
+            reject(error); 
+          });
+      });
+    };
+  };
+
+
   export const deleteCustomer = (id) => {
     return (dispatch) => {
       axios

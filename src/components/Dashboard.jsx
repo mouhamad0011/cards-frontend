@@ -14,10 +14,13 @@ import {
     addPurchase,
     addPayment,
     deleteCustomer,
+    editCustomer
 } from "../redux/actions/customers";
 import Loading from "./Loading";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PaymentIcon from "@mui/icons-material/Payment";
+import WalletIcon from "@mui/icons-material/Wallet";
 import {
   Box,
   Button,
@@ -36,6 +39,11 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [openPurchaseModal, setOpenPurchaseModal] = useState(false);
+  const [openPaymentModal, setOpenPaymentModal] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const id = getUserID();
   const customers = useSelector((state) => state.customers);
   const dispatch = useDispatch();
@@ -52,33 +60,27 @@ const Dashboard = () => {
         enableEditing: false,
       },
       {
-        accessorKey: "userId",
-        header: "userId",
-        size: 0,
-        enableEditing: false,
-      },
-      {
         accessorKey: "name",
         header: "name",
-        size: 250,
+        size: 100,
         enableEditing: true,
       },
       {
         accessorKey: "phone",
         header: "phone",
-        size: 250,
+        size: 100,
         enableEditing: true,
         enableClickToCopy: true,
       },
       {
         accessorKey: "total",
         header: "total",
-        size: 250,
-        enableEditing: true,
+        size: 100,
+        enableEditing: false,
       },{
         accessorKey: "transactions",
         header: "Transactions",
-        size: 350,
+        size: 300,
         enableEditing: false,
         Cell: ({ cell }) => {
           const transactions = cell.getValue();
@@ -99,54 +101,100 @@ const Dashboard = () => {
     []
   );
 
-//   const handleSaveUser = async ({ values, table }) => {
-//     dispatch(
-//       updateUser(
-//         values._id,
-//         token,
-//         values.firstName,
-//         values.lastName,
-//         values.email,
-//         values.role
-//       )
-//     );
-//     toast.success("User updated successfully!")
-//     table.setEditingRow(null); //exit editing mode
-//   };
+  const handleUpdateCustomer = async ({ values, table }) => {
+    dispatch(
+      editCustomer(
+        values._id,
+        values.name,
+        values.phone
+      )
+    );
+    toast.success("Customer updated successfully!")
+    table.setEditingRow(null); 
+  };
 
-//   const handleDelete = async (id) => {
-//     dispatch(deleteUser(id, token));
-//     toast.success("User deleted successfully!")
-//     setOpenDeleteConfirmModal(null);
-//   };
+  const handleDelete = async (id) => {
+    dispatch(deleteCustomer(id));
+    setOpenDeleteConfirmModal(null);
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+    }, 3000);
+    toast.success("Customer deleted successfully!")
+  };
 
-  const handleAddingCustomer = async ({ values, table }) => {
-    dispatch(addCustomer(name, phone))
+  const handleAddingCustomer = async ({ table }) => {
+    dispatch(addCustomer(id, name, phone));
     table.setCreatingRow(null);
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
     }, 3000);
+    toast.success("Customer added successfully!")
   };
+
+  const handleAddPurchase = async () => {
+    if (!selectedCustomer || !amount || !description) {
+      toast.error("Please fill all fields!");
+      return;
+    }
+    dispatch(addPurchase(selectedCustomer._id, amount, description));
+    setOpenPurchaseModal(false);
+    setAmount("");
+    setDescription("");
+    toast.success("Purchase added successfully!");
+  };
+  
+  const handleAddPayment = async () => {
+    if (!selectedCustomer || !amount || !description) {
+      toast.error("Please fill all fields!");
+      return;
+    }
+    dispatch(addPayment(selectedCustomer._id, amount, description));
+    setOpenPaymentModal(false);
+    setAmount("");
+    setDescription("");
+    toast.success("Payment added successfully!");
+  };
+
+
   const table = useMaterialReactTable({
     initialState: { columnVisibility: { _id: false } },
     columns,
     data: customers.length !== 0 ? customers : [],
-    createDisplayMode: "modal", //default ('row', and 'custom' are also available)
-    editDisplayMode: "modal", //default ('row', 'cell', 'table', and 'custom' are also available)
+    createDisplayMode: "modal", 
+    editDisplayMode: "modal", 
     enableEditing: true,
-    //getRowId: (row) => row.id,
-    // onEditingRowSave: handleSaveUser,
+    getRowId: (row) => row.id,
+    onEditingRowSave: handleUpdateCustomer,
     onCreatingRowSave: handleAddingCustomer,
     renderRowActions: ({ row, table }) => (
-      <Box sx={{ display: "flex", gap: "1rem" }}>
+      <Box sx={{ display: "flex", gap: "0.5rem" }}>
+         <Tooltip title="Purchase">
+  <IconButton onClick={() => {
+    setSelectedCustomer(row.original);
+    setOpenPurchaseModal(true);
+  }}>
+    <WalletIcon />
+  </IconButton>
+</Tooltip>
+
+<Tooltip title="Payment">
+  <IconButton onClick={() => {
+    setSelectedCustomer(row.original);
+    setOpenPaymentModal(true);
+  }}>
+    <PaymentIcon />
+  </IconButton>
+</Tooltip>
+
         <Tooltip title="Edit">
-          <IconButton onClick={() => table.setEditingRow(row)}>
+          <IconButton onClick={() => table.setEditingRow(row)} >
             <EditIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete">
-          <IconButton color="error" onClick={() => setOpenDeleteConfirmModal(row)}>
+          <IconButton color="default" onClick={() => setOpenDeleteConfirmModal(row)}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -154,9 +202,9 @@ const Dashboard = () => {
     ),
     renderCreateRowDialogContent: ({ table, row }) => (
       <>
-        <DialogTitle variant="h3">Add new customer</DialogTitle>
+        <DialogTitle variant="h4">Add customer</DialogTitle>
         <DialogContent
-          sx={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: "20px" }}
+          sx={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: "30px" }}
         >
          <TextField
             type="text"
@@ -186,12 +234,13 @@ const Dashboard = () => {
         onClick={() => {
           table.setCreatingRow(true); 
         }}
-        style={{backgroundColor:"rgba(253,187,45,1)", padding:"10px", textTransform:"none", fontSize:"20px"}}
+        style={{backgroundColor:"rgba(253,187,45,1)", padding:"5px", textTransform:"none", fontSize:"20px",}}
       >
         Add customer
       </Button>
     ),
   });
+  
   if (openDeleteConfirmModal !== null) {
     return(
     <div>
@@ -203,11 +252,13 @@ const Dashboard = () => {
         onReject={() => {
           setOpenDeleteConfirmModal(null);
         }}
-        // onAccept={() => handleDelete(openDeleteConfirmModal.original._id)}
+        onAccept={() => handleDelete(openDeleteConfirmModal.original._id)}
       />
     </div>
     );
   }
+
+  
   if (customers.length === 0 || loading) {
     return (
       <>

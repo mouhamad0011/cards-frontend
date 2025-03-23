@@ -10,6 +10,10 @@ const customerReducer = (state = [], action) => {
           return action.payload;
         case "addPurchase":
           return action.payload;    
+        case "editCustomer":
+          return state.map((event) =>
+            event._id === action.payload.Id ? action.payload.customer : event
+          );
         default:
           return state;
       }
