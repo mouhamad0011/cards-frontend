@@ -578,7 +578,21 @@ const Dashboard = () => {
           </Button>
         </Box>
       </Modal>
+      
       <MaterialReactTable table={table} />
+      <Button
+            variant="contained"
+            style={{
+              backgroundColor: "white",
+              color: "black",
+              padding: "5px",
+              textTransform: "none",
+              fontSize: "17px",
+              width: "100%",
+            }}
+          >
+            Total: {customers.reduce((acc, customer) => acc + customer.total, 0)}
+          </Button>
     </>
   );
 };
