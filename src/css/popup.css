@@ -76,7 +76,7 @@
   
 @media screen and (max-width: 576px) {
   .confirmation-popup-container {
-    width: 300px;
+    width: 250px;
     height: 150px;
     top: 28%;
   }

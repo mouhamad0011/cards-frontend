@@ -4,19 +4,19 @@ import { toast } from "react-hot-toast";
 import {
   MaterialReactTable,
   useMaterialReactTable,
-  MRT_EditActionButtons
+  MRT_EditActionButtons,
 } from "material-react-table";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-    addCustomer,
-    getCustomersByUser,
-    addPurchase,
-    addPayment,
-    deleteCustomer,
-    editCustomer,
-    clearTransactionsHistory
+  addCustomer,
+  getCustomersByUser,
+  addPurchase,
+  addPayment,
+  deleteCustomer,
+  editCustomer,
+  clearTransactionsHistory,
 } from "../redux/actions/customers";
 import Loading from "./Loading";
 import EditIcon from "@mui/icons-material/Edit";
@@ -32,10 +32,9 @@ import {
   IconButton,
   Tooltip,
   TextField,
-  Modal
+  Modal,
 } from "@mui/material";
-import {getUserID} from "../userInfo";
-
+import { getUserID } from "../userInfo";
 
 const Dashboard = () => {
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(null);
@@ -54,13 +53,12 @@ const Dashboard = () => {
   const id = getUserID();
   const customers = useSelector((state) => state.customers);
   const dispatch = useDispatch();
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if(!id){
+    if (!id) {
       navigate("/");
-    }
-    else{
+    } else {
       dispatch(getCustomersByUser(id));
     }
   }, [dispatch]);
@@ -79,7 +77,7 @@ const Dashboard = () => {
     p: 4,
     display: "flex",
     flexDirection: "column",
-    gap : "20px",
+    gap: "20px",
     alignItems: "center",
     justifyContent: "center",
   };
@@ -97,8 +95,13 @@ const Dashboard = () => {
         header: "name",
         Cell: ({ row }) => (
           <span
-            onClick={() => {{setSelectedTransactions(row.original.transactions)}; setCustId(row.original._id)}}
-            style={{ cursor: "pointer"}}
+            onClick={() => {
+              {
+                setSelectedTransactions(row.original.transactions);
+              }
+              setCustId(row.original._id);
+            }}
+            style={{ cursor: "pointer" }}
           >
             {row.original.name}
           </span>
@@ -111,8 +114,13 @@ const Dashboard = () => {
         header: "phone",
         Cell: ({ row }) => (
           <span
-            onClick={() => {{setSelectedTransactions(row.original.transactions)}; setCustId(row.original._id)}}
-            style={{ cursor: "pointer"}}
+            onClick={() => {
+              {
+                setSelectedTransactions(row.original.transactions);
+              }
+              setCustId(row.original._id);
+            }}
+            style={{ cursor: "pointer" }}
           >
             {row.original.phone}
           </span>
@@ -126,8 +134,13 @@ const Dashboard = () => {
         header: "total",
         Cell: ({ row }) => (
           <span
-            onClick={() => {{setSelectedTransactions(row.original.transactions)}; setCustId(row.original._id)}}
-            style={{ cursor: "pointer"}}
+            onClick={() => {
+              {
+                setSelectedTransactions(row.original.transactions);
+              }
+              setCustId(row.original._id);
+            }}
+            style={{ cursor: "pointer" }}
           >
             {row.original.total}
           </span>
@@ -142,20 +155,40 @@ const Dashboard = () => {
         enableEditing: false,
         Cell: ({ cell, row }) => {
           const transactions = cell.getValue();
-          if (!transactions || transactions.length === 0) return "No transactions";
-          const groupedTransactions = transactions.reduce((acc, transaction) => {
-            const key = transaction.for || "Main" ;
-            const amount = transaction.type === "payment" ? -transaction.amount : transaction.amount;
-      
-            if (!acc[key]) {
-              acc[key] = { totalAmount: 0 };
-            }
-            acc[key].totalAmount += amount;
-            return acc;
-          }, {});
-      
+          if (!transactions || transactions.length === 0)
+            return "No transactions";
+          const groupedTransactions = transactions.reduce(
+            (acc, transaction) => {
+              const key = transaction.for || "Main";
+              const amount =
+                transaction.type === "payment"
+                  ? -transaction.amount
+                  : transaction.amount;
+
+              if (!acc[key]) {
+                acc[key] = { totalAmount: 0 };
+              }
+              acc[key].totalAmount += amount;
+              return acc;
+            },
+            {}
+          );
+
           return (
-            <ul style={{ padding: 0, margin: 0, listStyleType: "none", cursor: "pointer" }} onClick={() => {{setSelectedTransactions(transactions)}; setCustId(row.original._id)}}>
+            <ul
+              style={{
+                padding: 0,
+                margin: 0,
+                listStyleType: "none",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                {
+                  setSelectedTransactions(transactions);
+                }
+                setCustId(row.original._id);
+              }}
+            >
               {Object.entries(groupedTransactions).map(([key, data]) => (
                 <li key={key}>
                   <strong>{key}:</strong> {data.totalAmount}
@@ -165,55 +198,48 @@ const Dashboard = () => {
           );
         },
       },
-      
     ],
     []
   );
 
   const handleUpdateCustomer = async ({ values, table }) => {
-    dispatch(
-      editCustomer(
-        values._id,
-        values.name,
-        values.phone
-      )
-    );
-    toast.success("Customer updated successfully!")
-    table.setEditingRow(null); 
+    dispatch(editCustomer(values._id, values.name, values.phone));
+    toast.success("Customer updated successfully!");
+    table.setEditingRow(null);
   };
 
   const handleDelete = async (id) => {
     dispatch(deleteCustomer(id));
     setOpenDeleteConfirmModal(null);
-    setLoading(true)
+    setLoading(true);
     setTimeout(() => {
-      setLoading(false)
+      setLoading(false);
     }, 3000);
-    toast.success("Customer deleted successfully!")
+    toast.success("Customer deleted successfully!");
   };
 
   const handleClear = async (id) => {
     dispatch(clearTransactionsHistory(id));
-    setLoading(true)
+    setLoading(true);
     setTimeout(() => {
-      setLoading(false)
+      setLoading(false);
     }, 3000);
     setSelectedTransactions(null);
-    toast.success("Transactions history cleared successfully!")
+    toast.success("Transactions history cleared successfully!");
   };
 
   const handleAddingCustomer = async ({ table }) => {
     dispatch(addCustomer(id, name, phone));
     table.setCreatingRow(null);
-    setLoading(true)
+    setLoading(true);
     setTimeout(() => {
-      setLoading(false)
+      setLoading(false);
     }, 3000);
-    toast.success("Customer added successfully!")
+    toast.success("Customer added successfully!");
   };
 
   const handleAddPurchase = async () => {
-    if (!selectedCustomer || !amount ) {
+    if (!selectedCustomer || !amount) {
       toast.error("Please fill all fields!");
       return;
     }
@@ -223,55 +249,63 @@ const Dashboard = () => {
     setDescription("");
     toast.success("Purchase added successfully!");
   };
-  
+
   const handleAddPayment = async () => {
     if (!selectedCustomer || !amount) {
       toast.error("Please fill all fields!");
       return;
     }
-    dispatch(addPayment(selectedCustomer._id, amount, forPeople, description, id));
+    dispatch(
+      addPayment(selectedCustomer._id, amount, forPeople, description, id)
+    );
     setOpenPaymentModal(false);
     setAmount(0);
     setDescription("");
     toast.success("Payment added successfully!");
   };
 
-
   const table = useMaterialReactTable({
     initialState: { columnVisibility: { _id: false } },
     columns,
     data: customers.length !== 0 ? customers : [],
-    createDisplayMode: "modal", 
-    editDisplayMode: "modal", 
+    createDisplayMode: "modal",
+    editDisplayMode: "modal",
     enableEditing: true,
     getRowId: (row) => row.id,
     onEditingRowSave: handleUpdateCustomer,
     onCreatingRowSave: handleAddingCustomer,
     renderRowActions: ({ row, table }) => (
       <Box sx={{ display: "flex", gap: "0.5rem" }}>
-         <Tooltip title="Purchase">
-          <IconButton onClick={() => {
-            setSelectedCustomer(row.original._id);
-            setOpenPurchaseModal(true);
-          }}>
+        <Tooltip title="Purchase">
+          <IconButton
+            onClick={() => {
+              setSelectedCustomer(row.original._id);
+              setOpenPurchaseModal(true);
+            }}
+          >
             <WalletIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Payment">
-          <IconButton onClick={() => {
-            setSelectedCustomer(row.original);
-            setOpenPaymentModal(true);
-          }}>
+          <IconButton
+            onClick={() => {
+              setSelectedCustomer(row.original);
+              setOpenPaymentModal(true);
+            }}
+          >
             <PaymentIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Edit">
-          <IconButton onClick={() => table.setEditingRow(row)} >
+          <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete">
-          <IconButton color="default" onClick={() => setOpenDeleteConfirmModal(row)}>
+          <IconButton
+            color="default"
+            onClick={() => setOpenDeleteConfirmModal(row)}
+          >
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -281,9 +315,14 @@ const Dashboard = () => {
       <>
         <DialogTitle variant="h4">Add customer</DialogTitle>
         <DialogContent
-          sx={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: "30px" }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            marginTop: "30px",
+          }}
         >
-         <TextField
+          <TextField
             type="text"
             label="name"
             onChange={(event) => {
@@ -309,38 +348,43 @@ const Dashboard = () => {
       <Button
         variant="contained"
         onClick={() => {
-          table.setCreatingRow(true); 
+          table.setCreatingRow(true);
         }}
-        style={{backgroundColor:"rgba(253,187,45,1)", padding:"5px", textTransform:"none", fontSize:"20px",}}
+        sx={{
+          backgroundColor: "rgba(253,187,45,1)",
+          padding: "5px",
+          textTransform: "none",
+          fontSize: "20px",
+          "@media (min-width: 350px) and (max-width: 500px)": {
+            fontSize: "17px",
+          }, 
+          "@media (min-width: 250px) and (max-width: 350px)": {
+            fontSize: "14px",
+          },
+        }}
       >
         Add customer
       </Button>
     ),
-    // muiTableBodyRowProps: ({ row }) => ({
-    //   onClick: () => {
-    //     setSelectedTransactions(row.original.transactions); 
-    //   },
-    //   sx: { cursor: "pointer" }, 
-    // }),
   });
-  
+
   if (openDeleteConfirmModal !== null) {
-    return(
-    <div>
-      <MaterialReactTable table={table} />
-      <Popup
-        title="Are you sure you want to delete this customer?"
-        cancelLabel="Cancel"
-        confirmLabel="Delete"
-        onReject={() => {
-          setOpenDeleteConfirmModal(null);
-        }}
-        onAccept={() => handleDelete(openDeleteConfirmModal.original._id)}
-      />
-    </div>
+    return (
+      <div>
+        <MaterialReactTable table={table} />
+        <Popup
+          title="Are you sure you want to delete this customer?"
+          cancelLabel="Cancel"
+          confirmLabel="Delete"
+          onReject={() => {
+            setOpenDeleteConfirmModal(null);
+          }}
+          onAccept={() => handleDelete(openDeleteConfirmModal.original._id)}
+        />
+      </div>
     );
   }
-  
+
   if (customers.length === 0 || loading) {
     return (
       <>
@@ -358,140 +402,185 @@ const Dashboard = () => {
       </>
     );
   }
-  return <> <Modal
-  open={openPurchaseModal}
-  onClose={() => setOpenPurchaseModal(false)}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-    <DialogTitle variant="h4">Add purchase</DialogTitle>
-      <TextField
-        type="number"
-        label="Amount"
-        onChange={(event) => {
-          setAmount(event.target.value);
+  return (
+    <>
+      {" "}
+      <Modal
+        open={openPurchaseModal}
+        onClose={() => setOpenPurchaseModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <DialogTitle variant="h4">Purchase</DialogTitle>
+          <TextField
+            type="number"
+            label="Amount"
+            onChange={(event) => {
+              setAmount(event.target.value);
+            }}
+            required
+          />
+          <TextField
+            type="text"
+            label="For"
+            onChange={(event) => {
+              setForPeople(event.target.value);
+            }}
+          />
+          <TextField
+            type="text"
+            label="Description"
+            onChange={(event) => {
+              setDescription(event.target.value);
+            }}
+          />
+          <DialogActions>
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: "rgba(253,187,45,1)",
+                padding: "5px",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
+              onClick={handleAddPurchase}
+            >
+              Add
+            </Button>
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: "rgba(253,187,45,1)",
+                padding: "5px",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
+              onClick={() => setOpenPurchaseModal(false)}
+            >
+              Cancel
+            </Button>
+          </DialogActions>
+        </Box>
+      </Modal>
+      <Modal
+        open={openPaymentModal}
+        onClose={() => setOpenPaymentModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <DialogTitle variant="h4">Payment</DialogTitle>
+          <TextField
+            type="number"
+            label="Amount"
+            onChange={(event) => {
+              setAmount(event.target.value);
+            }}
+            required
+          />
+          <TextField
+            type="text"
+            label="For"
+            onChange={(event) => {
+              setForPeople(event.target.value);
+            }}
+          />
+          <TextField
+            type="text"
+            label="Description"
+            onChange={(event) => {
+              setDescription(event.target.value);
+            }}
+          />
+          <DialogActions>
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: "rgba(253,187,45,1)",
+                padding: "5px",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
+              onClick={handleAddPayment}
+            >
+              Add
+            </Button>
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: "rgba(253,187,45,1)",
+                padding: "5px",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
+              onClick={() => setOpenPaymentModal(false)}
+            >
+              Cancel
+            </Button>
+          </DialogActions>
+        </Box>
+      </Modal>
+      <Modal
+        open={selectedTransactions !== null}
+        onClose={() => {
+          setSelectedTransactions(null);
+          setFilterFor("");
         }}
-        required
-      />
-      <TextField
-        type="text"
-        label="For"
-        onChange={(event) => {
-          setForPeople(event.target.value);
-        }}/>
-      <TextField
-        type="text"
-        label="Description"
-        onChange={(event) => {
-          setDescription(event.target.value);
-        }}/>
-         <DialogActions style={{marginLeft:"-83px"}}>
-         <Button
-        variant="contained"
-        style={{backgroundColor:"rgba(253,187,45,1)", padding:"5px", textTransform:"none", fontSize:"15px",}}
-        onClick={handleAddPurchase}>
-        Add
-      </Button>
-      <Button
-        variant="contained"
-        style={{backgroundColor:"rgba(253,187,45,1)", padding:"5px", textTransform:"none", fontSize:"15px",}}
-        onClick={() => setOpenPurchaseModal(false)}>
-        Cancel
-      </Button>
-         </DialogActions>
-       
-  </Box>
-</Modal>
-<Modal
-  open={openPaymentModal}
-  onClose={() => setOpenPaymentModal(false)}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-    <DialogTitle variant="h4">Add payment</DialogTitle>
-      <TextField
-        type="number"
-        label="Amount"
-        onChange={(event) => {
-          setAmount(event.target.value);
-        }}
-        required
-      />
-      <TextField
-        type="text"
-        label="For"
-        onChange={(event) => {
-          setForPeople(event.target.value);
-        }}/>
-      <TextField
-        type="text"
-        label="Description"
-        onChange={(event) => {
-          setDescription(event.target.value);
-        }}/>
-         <DialogActions style={{marginLeft:"-83px"}}>
-         <Button
-        variant="contained"
-        style={{backgroundColor:"rgba(253,187,45,1)", padding:"5px", textTransform:"none", fontSize:"15px",}}
-        onClick={handleAddPayment}>
-        Add
-      </Button>
-      <Button
-        variant="contained"
-        style={{backgroundColor:"rgba(253,187,45,1)", padding:"5px", textTransform:"none", fontSize:"15px",}}
-        onClick={() => setOpenPaymentModal(false)}>
-        Cancel
-      </Button>
-         </DialogActions>
-       
-  </Box>
-</Modal>
-<Modal
-  open={selectedTransactions !== null}
-  onClose={() => {
-    setSelectedTransactions(null);
-    setFilterFor("");
-  }}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-    <DialogTitle variant="h4">History</DialogTitle>
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <DialogTitle variant="h4">History</DialogTitle>
 
-    <TextField
-      label="Filter by"
-      variant="outlined"
-      fullWidth
-      value={filterFor}
-      onChange={(e) => setFilterFor(e.target.value)}
-      sx={{ mb: 2 }}
-    />
+          <TextField
+            label="Filter by"
+            variant="outlined"
+            fullWidth
+            value={filterFor}
+            onChange={(e) => setFilterFor(e.target.value)}
+            sx={{ mb: 2 }}
+          />
 
-    <ul style={{ padding: 0, margin: 0, listStyleType: "none" }}>
-      {selectedTransactions &&
-        selectedTransactions
-          .filter((transaction) =>
-            filterFor ? transaction.for?.toLowerCase().includes(filterFor.toLowerCase()) : true
-          )
-          .map((transaction, index) => (
-            <li key={index}>
-              <strong>{transaction.type}:</strong> {transaction.amount} ({new Date(transaction.date).toLocaleDateString()}) 
-              {transaction.for ? ` - ${transaction.for}` : " - main"} 
-              {transaction.description ? ` - ${transaction.description}` : ""}
-            </li>
-          ))}
-    </ul>
-    <Button
+          <ul style={{ padding: 0, margin: 0, listStyleType: "none" }}>
+            {selectedTransactions &&
+              selectedTransactions
+                .filter((transaction) =>
+                  filterFor
+                    ? transaction.for
+                        ?.toLowerCase()
+                        .includes(filterFor.toLowerCase())
+                    : true
+                )
+                .map((transaction, index) => (
+                  <li key={index}>
+                    <strong>{transaction.type}:</strong> {transaction.amount} (
+                    {new Date(transaction.date).toLocaleDateString()})
+                    {transaction.for ? ` - ${transaction.for}` : " - main"}
+                    {transaction.description
+                      ? ` - ${transaction.description}`
+                      : ""}
+                  </li>
+                ))}
+          </ul>
+          <Button
             variant="contained"
-            style={{backgroundColor:"rgba(253,187,45,1)", padding:"5px", textTransform:"none", fontSize:"17px", width:"100%"}}
-            onClick={() => handleClear(custId)}>
+            style={{
+              backgroundColor: "rgba(253,187,45,1)",
+              padding: "5px",
+              textTransform: "none",
+              fontSize: "17px",
+              width: "100%",
+            }}
+            onClick={() => handleClear(custId)}
+          >
             Clear history
-    </Button> 
-  </Box>
-</Modal>
-<MaterialReactTable table={table} /></>;
+          </Button>
+        </Box>
+      </Modal>
+      <MaterialReactTable table={table} />
+    </>
+  );
 };
 
 export default Dashboard;
