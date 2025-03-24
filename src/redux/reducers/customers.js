@@ -5,7 +5,9 @@ const customerReducer = (state = [], action) => {
         case "addCustomer":
           return [...state, action.payload];
         case "deleteCustomer":
-          return state.filter((event) => event._id !== action.payload);
+          return action.payload;
+        case "clearTransactionsHistory":
+          return action.payload;  
         case "addPayment":
           return action.payload;
         case "addPurchase":

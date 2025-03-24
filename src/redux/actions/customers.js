@@ -40,16 +40,16 @@ export const getCustomersByUser = (userId) => {
     };
   };
 
-  export const addPurchase = (customerId, amount, forPeople) => {
+  export const addPurchase = (customerId, amount, forPeople, description, userId) => {
     return (dispatch) => {
       return new Promise((resolve, reject) => {
         axios
-          .post(`${process.env.REACT_APP_BACKEND}/customers/addPurchase`, {customerId, amount, forPeople})
+          .post(`${process.env.REACT_APP_BACKEND}/customers/addPurchase`, {customerId, amount, forPeople, description, userId})
           .then((response) => {
-            const balance = response.data.balance;
+            const customers = response.data.customers;
             dispatch({
               type: "addPurchase",
-              payload: balance ,
+              payload: customers ,
             });
             resolve(); 
           })
@@ -60,16 +60,16 @@ export const getCustomersByUser = (userId) => {
     };
   };
 
-  export const addPayment = (customerId, amount, forPeople) => {
+  export const addPayment = (customerId, amount, forPeople, description, userId) => {
     return (dispatch) => {
       return new Promise((resolve, reject) => {
         axios
-          .post(`${process.env.REACT_APP_BACKEND}/customers/addPayment`, {customerId, amount, forPeople})
+          .post(`${process.env.REACT_APP_BACKEND}/customers/addPayment`, {customerId, amount, forPeople, description, userId})
           .then((response) => {
-            const balance = response.data.balance;
+            const customers = response.data.customers;
             dispatch({
               type: "addPayment",
-              payload:  balance ,
+              payload:  customers ,
             });
             resolve(); 
           })
@@ -105,14 +105,32 @@ export const getCustomersByUser = (userId) => {
     return (dispatch) => {
       axios
         .delete(`${process.env.REACT_APP_BACKEND}/customers/deleteCustomer/${id}`)
-        .then(() => {
+        .then((response) => {
+          const customers = response.data.customers;
           dispatch({
             type: "deleteCustomer",
-            payload: id,
+            payload: customers,
           });
         })
         .catch((error) => {
           console.error("Error while deleting:", error);
+        });
+    };
+  };
+ 
+  export const clearTransactionsHistory = (id) => {
+    return (dispatch) => {
+      axios
+        .delete(`${process.env.REACT_APP_BACKEND}/customers/clearTransactionsHistory/${id}`)
+        .then((response) => {
+          const customers = response.data.customers;
+          dispatch({
+            type: "clearTransactionsHistory",
+            payload: customers,
+          });
+        })
+        .catch((error) => {
+          console.error("Error while clearing:", error);
         });
     };
   };

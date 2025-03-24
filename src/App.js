@@ -8,8 +8,9 @@ function App() {
     <BrowserRouter>
       <Toaster toastOptions={{ duration: 5000 }} />
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/admin" element={ <Dashboard /> } />
+        <Route path="/" element={<Login/>} />
+        <Route path="/admin" element={<Dashboard/>} />
+        <Route path="/*" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );

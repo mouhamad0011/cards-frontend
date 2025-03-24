@@ -8,11 +8,11 @@ export const login = (name, password) => {
         .then((response) => {
           const token = response.data.token;
           const id = response.data.id;
+          localStorage.setItem("token",token);
           dispatch({
             type: "login",
             payload: { token, id },
           });
-          localStorage.setItem("token",token);
           resolve(); 
         })
         .catch((error) => {
