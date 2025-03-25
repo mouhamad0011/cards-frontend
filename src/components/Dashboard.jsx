@@ -82,6 +82,25 @@ const Dashboard = () => {
     justifyContent: "center",
   };
 
+  const transactionsStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "70%",
+    height: "fit-content",
+    maxWidth: "70%",
+    bgcolor: "background.paper",
+    border: "none",
+    boxShadow: 24,
+    p: 4,
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -530,7 +549,7 @@ const Dashboard = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box sx={transactionsStyle}>
           <DialogTitle variant="h4">History</DialogTitle>
 
           <TextField

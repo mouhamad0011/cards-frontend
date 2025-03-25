@@ -1,19 +1,19 @@
 {
   "short_name": "Tshrijet",
-  "name": "Create React App Sample",
+  "name": "Tshrijet",
   "icons": [
     {
-      "src": "alfa.png",
+      "src": "touch.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "alfa.png",
+      "src": "touch.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "alfa.png",
+      "src": "touch.png",
       "type": "image/png",
       "sizes": "512x512"
     }
