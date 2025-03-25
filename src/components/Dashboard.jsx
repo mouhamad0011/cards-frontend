@@ -542,7 +542,7 @@ const Dashboard = () => {
             sx={{ mb: 2 }}
           />
 
-          <ul style={{ padding: 0, margin: 0, listStyleType: "none" }}>
+          <ul style={{ padding: 0, margin: 0, listStyleType: "none", maxHeight: "200px", overflowY: "auto" }}>
             {selectedTransactions &&
               selectedTransactions
                 .filter((transaction) =>
