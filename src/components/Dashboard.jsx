@@ -266,6 +266,7 @@ const Dashboard = () => {
     setOpenPurchaseModal(false);
     setAmount(0);
     setDescription("");
+    setForPeople("Main");
     toast.success("Purchase added successfully!");
   };
 
@@ -280,11 +281,12 @@ const Dashboard = () => {
     setOpenPaymentModal(false);
     setAmount(0);
     setDescription("");
+    setForPeople("Main");
     toast.success("Payment added successfully!");
   };
 
   const table = useMaterialReactTable({
-    initialState: { columnVisibility: { _id: false } },
+    initialState: { columnVisibility: { _id: false }, pagination: { pageSize: 50 }, },
     columns,
     data: customers.length !== 0 ? customers : [],
     createDisplayMode: "modal",
