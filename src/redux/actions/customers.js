@@ -135,3 +135,47 @@ export const getCustomersByUser = (userId) => {
     };
   };
  
+  export const editTransaction = (customerId, transactionId, amount, forPeople, description, userId) => {
+    return (dispatch) => {
+      return new Promise((resolve, reject) => {
+        axios
+          .post(`${process.env.REACT_APP_BACKEND}/customers/editTransaction`, {
+            customerId,
+            transactionId,
+            amount,
+            forPeople,
+            description,
+            userId,
+          })
+          .then((response) => {
+            const customers = response.data.customers;
+            dispatch({
+              type: "editTransaction",
+              payload: customers,
+            });
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    };
+  };
+  
+  
+  export const deleteTransaction = (transactionId, customerId, userId) => {
+    return (dispatch) => {
+      axios
+        .delete(`${process.env.REACT_APP_BACKEND}/customers/deleteTransaction/${transactionId}/${customerId}/${userId}`)
+        .then((response) => {
+          const customers = response.data.customers;
+          dispatch({
+            type: "deleteTransaction",
+            payload: customers,
+          });
+        })
+        .catch((error) => {
+          console.error("Error while deleting:", error);
+        });
+    };
+  };

@@ -16,6 +16,10 @@ const customerReducer = (state = [], action) => {
           return state.map((event) =>
             event._id === action.payload.Id ? action.payload.customer : event
           );
+        case "editTransaction":
+          return action.payload;
+        case "deleteTransaction":
+          return action.payload;
         default:
           return state;
       }

@@ -17,6 +17,8 @@ import {
   deleteCustomer,
   editCustomer,
   clearTransactionsHistory,
+  editTransaction,
+  deleteTransaction,
 } from "../redux/actions/customers";
 import Loading from "./Loading";
 import EditIcon from "@mui/icons-material/Edit";
@@ -43,12 +45,14 @@ const Dashboard = () => {
   const [phone, setPhone] = useState("");
   const [openPurchaseModal, setOpenPurchaseModal] = useState(false);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
+  const [openEditTransactionModal, setOpenEditTransactionModal] = useState(false);
   const [amount, setAmount] = useState(0);
   const [description, setDescription] = useState("");
   const [forPeople, setForPeople] = useState("Main");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [custId, setCustId] = useState(null);
   const [selectedTransactions, setSelectedTransactions] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [filterFor, setFilterFor] = useState("");
   const id = getUserID();
   const customers = useSelector((state) => state.customers);
@@ -63,6 +67,15 @@ const Dashboard = () => {
     }
   }, [dispatch]);
 
+  useEffect(() => {
+    if (openEditTransactionModal && selectedTransaction) {
+      setAmount(selectedTransaction.amount);
+      setForPeople(selectedTransaction.for);
+      setDescription(selectedTransaction.description);
+    }
+  }, [openEditTransactionModal, selectedTransaction]);
+
+  
   const style = {
     position: "absolute",
     top: "50%",
@@ -285,6 +298,26 @@ const Dashboard = () => {
     toast.success("Payment added successfully!");
   };
 
+  const handleUpdateTransaction = async () => {
+    dispatch(editTransaction(custId, selectedTransaction._id, amount != 0 ? amount : selectedTransaction.amount, forPeople != "" ? forPeople : selectedTransaction.for, description != "" ? description : selectedTransaction.description, id));
+    setOpenEditTransactionModal(false);
+    setSelectedTransactions(null);
+    setAmount(0);
+    setDescription("");
+    setForPeople("Main");
+    toast.success("Transaction updated successfully!");
+  };
+
+  const handleDeleteTransaction = async () => {
+    dispatch(deleteTransaction(selectedTransaction._id, custId, id));
+    setOpenEditTransactionModal(false);
+    setSelectedTransactions(null);
+    setAmount(0);
+    setDescription("");
+    setForPeople("Main");
+    toast.success("Transaction deleted successfully!");
+  };
+  
   const table = useMaterialReactTable({
     initialState: { columnVisibility: { _id: false }, pagination: { pageSize: 50 }, },
     columns,
@@ -574,7 +607,7 @@ const Dashboard = () => {
                     : true
                 )
                 .map((transaction, index) => (
-                  <li key={index}>
+                  <li key={index} onClick={() => {setOpenEditTransactionModal(true); setSelectedTransaction(transaction)}} style={{ cursor: "pointer" }}>
                     <strong>{transaction.type}:</strong> {transaction.amount} (
                     {new Date(transaction.date).toLocaleDateString()})
                     {transaction.for ? ` - ${transaction.for}` : " - main"}
@@ -600,6 +633,70 @@ const Dashboard = () => {
         </Box>
       </Modal>
       
+      <Modal
+        open={openEditTransactionModal}
+        onClose={() => setOpenEditTransactionModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <DialogTitle variant="h4">Transaction</DialogTitle>
+          <TextField
+            type="number"
+            label="Amount"
+            onChange={(event) => {
+              setAmount(event.target.value);
+            }}
+            value={amount}
+            required
+          />
+          <TextField
+            type="text"
+            label="For"
+            onChange={(event) => {
+              setForPeople(event.target.value);
+            }}
+            value={forPeople}
+          />
+          <TextField
+            type="text"
+            label="Description"
+            onChange={(event) => {
+              setDescription(event.target.value);
+            }}
+            value={description}
+          />
+          <DialogActions>
+          <Button
+              variant="contained"
+              style={{
+                backgroundColor: "rgba(253,187,45,1)",
+                padding: "5px",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
+              onClick={() => handleDeleteTransaction()}
+            >
+              Delete
+            </Button>
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: "rgba(253,187,45,1)",
+                padding: "5px",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
+              onClick={() => handleUpdateTransaction()}
+            >
+              Edit
+            </Button>
+         
+          </DialogActions>
+        </Box>
+      </Modal>
+
+
       <MaterialReactTable table={table} />
       <Button
             variant="contained"
