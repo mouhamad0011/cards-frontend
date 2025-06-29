@@ -175,6 +175,8 @@ const Dashboard = () => {
             style={{ cursor: "pointer" }}
           >
             {row.original.total}
+            <br />
+            {(row.original.total / 89.0).toFixed(2)}$
           </span>
         ),
         size: 100,
@@ -223,7 +225,7 @@ const Dashboard = () => {
             >
               {Object.entries(groupedTransactions).map(([key, data]) => (
                 <li key={key}>
-                  <strong>{key}:</strong> {data.totalAmount}
+                  <strong>{key}:</strong> {data.totalAmount} - {(data.totalAmount/ 89.0).toFixed(2)}$
                 </li>
               ))}
             </ul>
