@@ -45,7 +45,8 @@ const Dashboard = () => {
   const [phone, setPhone] = useState("");
   const [openPurchaseModal, setOpenPurchaseModal] = useState(false);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
-  const [openEditTransactionModal, setOpenEditTransactionModal] = useState(false);
+  const [openEditTransactionModal, setOpenEditTransactionModal] =
+    useState(false);
   const [amount, setAmount] = useState(0);
   const [description, setDescription] = useState("");
   const [forPeople, setForPeople] = useState("Main");
@@ -54,6 +55,8 @@ const Dashboard = () => {
   const [selectedTransactions, setSelectedTransactions] = useState(null);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [filterFor, setFilterFor] = useState("");
+  const [selectedTransactionIds, setSelectedTransactionIds] = useState([]);
+
   const id = getUserID();
   const customers = useSelector((state) => state.customers);
   const dispatch = useDispatch();
@@ -75,7 +78,6 @@ const Dashboard = () => {
     }
   }, [openEditTransactionModal, selectedTransaction]);
 
-  
   const style = {
     position: "absolute",
     top: "50%",
@@ -225,7 +227,8 @@ const Dashboard = () => {
             >
               {Object.entries(groupedTransactions).map(([key, data]) => (
                 <li key={key}>
-                  <strong>{key}:</strong> {data.totalAmount} - {(data.totalAmount/ 89.0).toFixed(2)}$
+                  <strong>{key}:</strong> {data.totalAmount} -{" "}
+                  {(data.totalAmount / 89.0).toFixed(2)}$
                 </li>
               ))}
             </ul>
@@ -300,15 +303,15 @@ const Dashboard = () => {
     toast.success("Payment added successfully!");
   };
 
-  const handleUpdateTransaction = async () => {
-    dispatch(editTransaction(custId, selectedTransaction._id, amount != 0 ? amount : selectedTransaction.amount, forPeople != "" ? forPeople : selectedTransaction.for, description != "" ? description : selectedTransaction.description, id));
-    setOpenEditTransactionModal(false);
-    setSelectedTransactions(null);
-    setAmount(0);
-    setDescription("");
-    setForPeople("Main");
-    toast.success("Transaction updated successfully!");
-  };
+  // const handleUpdateTransaction = async () => {
+  //   dispatch(editTransaction(custId, selectedTransaction._id, amount != 0 ? amount : selectedTransaction.amount, forPeople != "" ? forPeople : selectedTransaction.for, description != "" ? description : selectedTransaction.description, id));
+  //   setOpenEditTransactionModal(false);
+  //   setSelectedTransactions(null);
+  //   setAmount(0);
+  //   setDescription("");
+  //   setForPeople("Main");
+  //   toast.success("Transaction updated successfully!");
+  // };
 
   const handleDeleteTransaction = async () => {
     dispatch(deleteTransaction(selectedTransaction._id, custId, id));
@@ -319,9 +322,12 @@ const Dashboard = () => {
     setForPeople("Main");
     toast.success("Transaction deleted successfully!");
   };
-  
+
   const table = useMaterialReactTable({
-    initialState: { columnVisibility: { _id: false }, pagination: { pageSize: 50 }, },
+    initialState: {
+      columnVisibility: { _id: false },
+      pagination: { pageSize: 50 },
+    },
     columns,
     data: customers.length !== 0 ? customers : [],
     createDisplayMode: "modal",
@@ -413,7 +419,7 @@ const Dashboard = () => {
           fontSize: "20px",
           "@media (min-width: 350px) and (max-width: 500px)": {
             fontSize: "17px",
-          }, 
+          },
           "@media (min-width: 250px) and (max-width: 350px)": {
             fontSize: "14px",
           },
@@ -598,7 +604,7 @@ const Dashboard = () => {
             sx={{ mb: 2 }}
           />
 
-          <ul style={{ padding: 0, margin: 0, listStyleType: "none", maxHeight: "200px", overflowY: "auto" }}>
+          {/* <ul style={{ padding: 0, margin: 0, listStyleType: "none", maxHeight: "200px", overflowY: "auto" }}>
             {selectedTransactions &&
               selectedTransactions
                 .filter((transaction) =>
@@ -618,7 +624,94 @@ const Dashboard = () => {
                       : ""}
                   </li>
                 ))}
+          </ul> */}
+          <ul
+            style={{
+              padding: 0,
+              margin: 0,
+              listStyleType: "none",
+              maxHeight: "200px",
+              overflowY: "auto",
+            }}
+          >
+            {selectedTransactions &&
+              selectedTransactions
+                .filter((transaction) =>
+                  filterFor
+                    ? transaction.for
+                        ?.toLowerCase()
+                        .includes(filterFor.toLowerCase())
+                    : true
+                )
+                .map((transaction, index) => (
+                  <li
+                    key={index}
+                    style={{
+                      cursor: "default",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedTransactionIds.includes(transaction._id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedTransactionIds([
+                            ...selectedTransactionIds,
+                            transaction._id,
+                          ]);
+                        } else {
+                          setSelectedTransactionIds(
+                            selectedTransactionIds.filter(
+                              (id) => id !== transaction._id
+                            )
+                          );
+                        }
+                      }}
+                    />
+                    <span>
+                      <strong>{transaction.type}:</strong> {transaction.amount}{" "}
+                      ({new Date(transaction.date).toLocaleDateString()})
+                      {transaction.for ? ` - ${transaction.for}` : " - main"}
+                      {transaction.description
+                        ? ` - ${transaction.description}`
+                        : ""}
+                    </span>
+                  </li>
+                ))}
           </ul>
+
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: "red",
+              padding: "5px",
+              textTransform: "none",
+              fontSize: "17px",
+              width: "100%",
+            }}
+            onClick={() => {
+              if (selectedTransactionIds.length === 0) {
+                toast.error("No transactions selected.");
+                return;
+              }
+              selectedTransactionIds.forEach((transactionId) => {
+                dispatch(deleteTransaction(transactionId, custId, id));
+              });
+              setLoading(true);
+              setTimeout(() => {
+                setLoading(false);
+              }, 3000);
+              setSelectedTransactionIds([]);
+              setSelectedTransactions(null);
+              toast.success("Selected transactions deleted successfully!");
+            }}
+          >
+            Delete Selected
+          </Button>
+
           <Button
             variant="contained"
             style={{
@@ -634,7 +727,6 @@ const Dashboard = () => {
           </Button>
         </Box>
       </Modal>
-      
       <Modal
         open={openEditTransactionModal}
         onClose={() => setOpenEditTransactionModal(false)}
@@ -669,7 +761,7 @@ const Dashboard = () => {
             value={description}
           />
           <DialogActions>
-          <Button
+            <Button
               variant="contained"
               style={{
                 backgroundColor: "rgba(253,187,45,1)",
@@ -681,38 +773,23 @@ const Dashboard = () => {
             >
               Delete
             </Button>
-            <Button
-              variant="contained"
-              style={{
-                backgroundColor: "rgba(253,187,45,1)",
-                padding: "5px",
-                textTransform: "none",
-                fontSize: "15px",
-              }}
-              onClick={() => handleUpdateTransaction()}
-            >
-              Edit
-            </Button>
-         
           </DialogActions>
         </Box>
       </Modal>
-
-
       <MaterialReactTable table={table} />
       <Button
-            variant="contained"
-            style={{
-              backgroundColor: "white",
-              color: "black",
-              padding: "5px",
-              textTransform: "none",
-              fontSize: "17px",
-              width: "100%",
-            }}
-          >
-            Total: {customers.reduce((acc, customer) => acc + customer.total, 0)}
-          </Button>
+        variant="contained"
+        style={{
+          backgroundColor: "white",
+          color: "black",
+          padding: "5px",
+          textTransform: "none",
+          fontSize: "17px",
+          width: "100%",
+        }}
+      >
+        Total: {customers.reduce((acc, customer) => acc + customer.total, 0)}
+      </Button>
     </>
   );
 };
