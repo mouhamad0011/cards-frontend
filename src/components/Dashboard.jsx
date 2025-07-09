@@ -303,15 +303,24 @@ const Dashboard = () => {
     toast.success("Payment added successfully!");
   };
 
-  // const handleUpdateTransaction = async () => {
-  //   dispatch(editTransaction(custId, selectedTransaction._id, amount != 0 ? amount : selectedTransaction.amount, forPeople != "" ? forPeople : selectedTransaction.for, description != "" ? description : selectedTransaction.description, id));
-  //   setOpenEditTransactionModal(false);
-  //   setSelectedTransactions(null);
-  //   setAmount(0);
-  //   setDescription("");
-  //   setForPeople("Main");
-  //   toast.success("Transaction updated successfully!");
-  // };
+  const handleUpdateTransaction = async () => {
+    dispatch(
+      editTransaction(
+        custId,
+        selectedTransaction._id,
+        amount != 0 ? amount : selectedTransaction.amount,
+        forPeople != "" ? forPeople : selectedTransaction.for,
+        description != "" ? description : selectedTransaction.description,
+        id
+      )
+    );
+    setOpenEditTransactionModal(false);
+    setSelectedTransactions(null);
+    setAmount(0);
+    setDescription("");
+    setForPeople("Main");
+    toast.success("Transaction updated successfully!");
+  };
 
   const handleDeleteTransaction = async () => {
     dispatch(deleteTransaction(selectedTransaction._id, custId, id));
@@ -671,7 +680,14 @@ const Dashboard = () => {
                         }
                       }}
                     />
-                    <span>
+
+                    <span
+                      onClick={() => {
+                        setOpenEditTransactionModal(true);
+                        setSelectedTransaction(transaction);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
                       <strong>{transaction.type}:</strong> {transaction.amount}{" "}
                       ({new Date(transaction.date).toLocaleDateString()})
                       {transaction.for ? ` - ${transaction.for}` : " - main"}
@@ -692,20 +708,24 @@ const Dashboard = () => {
               fontSize: "17px",
               width: "100%",
             }}
-            onClick={() => {
+            onClick={async () => {
               if (selectedTransactionIds.length === 0) {
                 toast.error("No transactions selected.");
                 return;
               }
-              selectedTransactionIds.forEach((transactionId) => {
-                dispatch(deleteTransaction(transactionId, custId, id));
-              });
+
               setLoading(true);
-              setTimeout(() => {
-                setLoading(false);
-              }, 3000);
+
+              for (let i = 0; i < selectedTransactionIds.length; i++) {
+                const transactionId = selectedTransactionIds[i];
+                await dispatch(deleteTransaction(transactionId, custId, id));
+                await dispatch(getCustomersByUser(id));
+                await new Promise((resolve) => setTimeout(resolve, 100));
+              }
+
               setSelectedTransactionIds([]);
               setSelectedTransactions(null);
+              setLoading(false);
               toast.success("Selected transactions deleted successfully!");
             }}
           >
@@ -769,9 +789,9 @@ const Dashboard = () => {
                 textTransform: "none",
                 fontSize: "15px",
               }}
-              onClick={() => handleDeleteTransaction()}
+              onClick={() => handleUpdateTransaction()}
             >
-              Delete
+              Edit
             </Button>
           </DialogActions>
         </Box>
