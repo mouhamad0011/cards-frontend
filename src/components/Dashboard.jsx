@@ -688,7 +688,7 @@ const Dashboard = () => {
                       }}
                       style={{ cursor: "pointer" }}
                     >
-                      <strong>{transaction.type}:</strong> {transaction.amount}{" "}
+                      <strong>{transaction.type}:</strong> {transaction.amount}{" - "}{(transaction.amount / 89.0).toFixed(2)}{"$ "}
                       ({new Date(transaction.date).toLocaleDateString()})
                       {transaction.for ? ` - ${transaction.for}` : " - main"}
                       {transaction.description
