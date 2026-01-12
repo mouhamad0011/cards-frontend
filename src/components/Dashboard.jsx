@@ -102,9 +102,9 @@ const Dashboard = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "70%",
+    width: "75%",
     height: "fit-content",
-    maxWidth: "70%",
+    maxWidth: "75%",
     bgcolor: "background.paper",
     border: "none",
     boxShadow: 24,
@@ -688,7 +688,12 @@ const Dashboard = () => {
                       }}
                       style={{ cursor: "pointer" }}
                     >
-                      <strong>{transaction.type}:</strong> {transaction.amount}{" - "}{(transaction.amount / 89.0).toFixed(2)}{"$ "}
+                      <strong>{transaction.type}:</strong> {transaction.amount}
+                      {" - "}
+                      <span style={{ color: "red" }}>
+                        {(transaction.amount / 89.0).toFixed(2)}
+                        {"$ "}
+                      </span>
                       ({new Date(transaction.date).toLocaleDateString()})
                       {transaction.for ? ` - ${transaction.for}` : " - main"}
                       {transaction.description
