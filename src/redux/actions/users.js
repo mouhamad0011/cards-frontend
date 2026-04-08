@@ -4,28 +4,26 @@ export const login = (name, password) => {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       axios
-        .post(`${process.env.REACT_APP_BACKEND}/users/login`, { name, password })
+        .post(
+          `${process.env.REACT_APP_BACKEND}/users/login`,
+          { name, password },
+          {
+            withCredentials: true,
+          }
+        )
         .then((response) => {
           const token = response.data.token;
           const id = response.data.id;
-          localStorage.setItem("token",token);
+          localStorage.setItem("token", token);
           dispatch({
             type: "login",
             payload: { token, id },
           });
-          resolve(); 
+          resolve();
         })
         .catch((error) => {
-          reject(error); 
+          reject(error);
         });
     });
   };
 };
-
-
-
-
-
-  
- 
- 
